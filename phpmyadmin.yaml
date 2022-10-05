@@ -1,0 +1,73 @@
+# adminer service
+apiVersion: v1
+kind: Service
+metadata:
+  name: phpmyadmin
+  labels:
+    app: phpmyadmin
+spec:
+  type: NodePort
+  ports:
+  - name: phpmyadmin
+    port: 80
+    targetPort: 80
+    nodePort: 30100
+  selector:
+    app: phpmyadmin
+
+
+# adminer deployment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: phpmyadmin
+  labels:
+    app: phpmyadmin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: phpmyadmin
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: phpmyadmin
+    spec:
+      containers:
+      - env:
+        - name: MYSQL_PASSWORD
+          value: "examplepass"
+        - name: MYSQL_ROOT_PASSWORD
+          value: "root"
+        - name: MYSQL_USER
+          value: "exampleuser"
+        - name: PMA_HOST
+          value: "db"
+        - name: PMA_PASSWORD
+          value: "examplepass"
+        - name: PMA_PORT
+          value: "3306"
+        #- name: PMA_USER
+        #  value: root
+        image: phpmyadmin/phpmyadmin
+        name: phpmyadmin
+        ports:
+        - containerPort: 80
+        
+        resources: {}
+        volumeMounts:
+        - mountPath: /sessions
+          name: phpmyadmin-claim
+        #- mountPath: /usr/local/etc/php/conf.d/php-adminer.ini
+        #  name: adminer-claim
+      restartPolicy: Always
+      volumes:
+      - name: phpmyadmin-claim
+        persistentVolumeClaim:
+          claimName: phpmyadmin-claim
+      
+      
+status: {}

@@ -1,0 +1,45 @@
+# mysql pvc
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: db-claim
+  labels:
+    app: db
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi  
+
+---
+# adminer pvc
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: phpmyadmin-claim
+  labels:
+    app: phpmyadmin
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+status: {}
+
+# php pvc
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: 
+  name: php-example-claim
+  labels:
+    app: php-example 
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi

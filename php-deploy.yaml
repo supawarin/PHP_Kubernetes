@@ -1,0 +1,49 @@
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: php-example
+  labels:
+    app: php-example    
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: php-example      
+  template:
+    metadata:
+      labels:
+        app: php-example        
+    spec:
+      containers:
+      - name: php-example
+        image: 127.0.0.1:5100/sample-php:latest
+        ports:
+            - containerPort: 80
+        resources: {}
+        volumeMounts:
+        - name: php-example-claim
+          mountPath: src/ /var/www/html/
+      volumes: 
+      - name: php-example-claim
+        persistentVolumeClaim:
+          claimName: php-example-claim
+---
+# php service
+apiVersion: v1
+kind: Service
+metadata:
+  name: php-example 
+  labels:
+    app: php-example 
+spec:
+  selector:
+    app: php-example 
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30101
+  type: NodePort
+
+      

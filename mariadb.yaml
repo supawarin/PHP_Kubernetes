@@ -1,0 +1,64 @@
+#mysql service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db # host
+  labels:
+    app: db
+spec:
+  ports:
+  - name: db-port
+    port: 3306
+    targetPort: 3306
+  selector:
+    app: db
+
+#mysql deployment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: db
+spec: 
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db      
+  strategy:
+    type: Recreate
+  template: 
+    metadata: 
+      labels: 
+        app: db      
+    spec:
+      containers:
+       - image: mariadb:latest
+         name: db-cont
+         env:
+         - name: MYSQL_DATABASE
+           value: "example"
+         - name: MYSQL_PASSWORD
+           value: "examplepass"
+         - name: MYSQL_ROOT_PASSWORD
+           value: "root"
+         - name: MYSQL_USER
+           value: "exampleuser"
+        
+         ports:
+         - containerPort: 3306
+         resources: {}
+         volumeMounts:
+         #- name: database-claim
+         #  mountPath: /docker-entrypoint-initdb.d
+         - name: db-claim
+           mountPath: /var/lib/mysql
+         #- name: database-claim2
+         #  mountPath: /var/log/mysql
+      restartPolicy: Always
+      volumes:
+      - name: db-claim
+        persistentVolumeClaim:
+          claimName: db-claim
+      
+status: {}
